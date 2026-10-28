@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SignBridge</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='none' stroke='%232dd4bf' stroke-width='4'/></svg>"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark"></span>SignBridge</div>
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-mode="translate" role="tab">Translate</button>
+        <button class="tab" data-mode="train" role="tab">Train</button>
+      </nav>
+    </header>
+
+    <main class="layout">
+      <!-- Video with landmark overlay and caption -->
+      <section class="stage-column">
+        <div class="stage" id="stage">
+          <video id="video" autoplay playsinline muted></video>
+          <canvas id="overlay"></canvas>
+
+          <div class="caption hidden" id="caption">
+            <div class="caption-text" id="caption-text"></div>
+            <div class="caption-gloss" id="caption-gloss"></div>
+          </div>
+
+          <div class="hand-status hidden" id="hand-status">No hand detected</div>
+          <div class="countdown hidden" id="countdown"></div>
+          <div class="stage-message" id="stage-message">Starting camera…</div>
+        </div>
+
+        <ol class="pipeline" id="pipeline">
+          <li class="step" data-step="tracking">Hand Tracking</li>
+          <li class="arrow">→</li>
+          <li class="step" data-step="recognition">Sign Recognition</li>
+          <li class="arrow">→</li>
+          <li class="step" data-step="translation">English Translation</li>
+        </ol>
+      </section>
+
+      <aside class="panel">
+        <!-- Translate mode -->
+        <div id="translate-panel">
+          <div class="card empty-state hidden" id="empty-state">
+            <h2>No signs trained yet</h2>
+            <p>Teach SignBridge your signs first. It only takes a few seconds per word.</p>
+            <button class="btn primary" id="go-train">Go to Train mode</button>
+          </div>
+
+          <div id="translate-content">
+            <div class="card">
+              <div class="card-title">Live prediction</div>
+              <div class="prediction-row">
+                <div class="prediction-label" id="prediction-label">—</div>
+                <svg class="ring" id="ring" viewBox="0 0 44 44" aria-hidden="true">
+                  <circle class="ring-track" cx="22" cy="22" r="19" />
+                  <circle class="ring-fill" id="ring-fill" cx="22" cy="22" r="19" />
+                </svg>
+              </div>
+              <div class="confidence">
+                <div class="bar"><div class="bar-fill" id="confidence-fill"></div></div>
+                <span class="confidence-value" id="confidence-value">0%</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Signed words</div>
+              <div class="chips" id="chips"></div>
+              <div class="button-row">
+                <button class="btn primary" id="translate-btn">Translate</button>
+                <button class="btn" id="undo-btn">Undo last word</button>
+                <button class="btn" id="clear-btn">Clear</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">History</div>
+              <ol class="history" id="history"></ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Train mode -->
+        <div id="train-panel" hidden>
+          <div class="card live-test">
+            <div class="card-title">Live test</div>
+            <div class="live-test-row">
+              <span class="live-test-label" id="test-label">—</span>
+              <span class="live-test-confidence" id="test-confidence"></span>
+            </div>
+          </div>
+
+          <div class="card hidden" id="record-status">
+            <div class="record-message" id="record-message"></div>
+            <div class="bar"><div class="bar-fill" id="record-fill"></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Vocabulary</div>
+            <ul class="vocab" id="vocab"></ul>
+            <form class="add-word" id="add-word-form">
+              <input id="add-word-input" type="text" placeholder="New word, e.g. THANK YOU" maxlength="30" />
+              <button class="btn" type="submit">Add word</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Training data</div>
+            <div class="button-row">
+              <button class="btn" id="export-btn">Export data</button>
+              <button class="btn" id="import-btn">Import data</button>
+              <button class="btn danger" id="reset-btn">Reset all data</button>
+            </div>
+            <input type="file" id="import-input" accept="application/json,.json" hidden />
+            <div class="confirm hidden" id="reset-confirm">
+              <span>Delete all recorded samples and custom words?</span>
+              <div class="button-row">
+                <button class="btn danger" id="reset-yes">Yes, reset</button>
+                <button class="btn" id="reset-no">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
